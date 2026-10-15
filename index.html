@@ -69,6 +69,32 @@
     break-after: page;
   }
 
+  .title-page {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 28pt;
+    font-weight: bold;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .author {
+    margin-top: 8mm;
+    font-size: 12pt;
+    color: var(--muted);
+  }
+
+  .dedication {
+    margin-top: 28mm;
+    font-size: 11pt;
+    color: var(--muted);
+  }
+
   .page-header {
     display: flex;
     justify-content: space-between;
@@ -147,13 +173,13 @@
 
 <div class="toolbar">
   <button onclick="window.print()">Print / Save as PDF</button>
-  <span>120 A5 pages · grouped by board size</span>
+  <span>122 A5 pages · title page, blank page, then game boards</span>
 </div>
 
 <main class="book" id="book"></main>
 
 <script>
-  // Each group has 12 pages: 10 groups x 12 = 120 pages.
+  // Each group has 12 pages: 10 groups x 12 = 120 game pages.
   // Values are boxes, not dots: a 5x5 board has 5 columns and 5 rows of boxes,
   // requiring a 6x6 grid of dots.
   const groups = [
@@ -166,6 +192,27 @@
   const pagesPerGroup = 12;
   const book = document.getElementById("book");
   let pageNumber = 0;
+
+  function createPage(className = "page") {
+    const page = document.createElement("section");
+    page.className = className;
+    book.appendChild(page);
+    return page;
+  }
+
+  function makeTitlePage() {
+    const page = createPage("page title-page");
+
+    page.innerHTML = `
+      <div class="title">Squares</div>
+      <div class="author">By Joseph Abell</div>
+      <div class="dedication">For Ginny, Jessica, Alex and friends</div>
+    `;
+  }
+
+  function makeBlankPage() {
+    createPage("page");
+  }
 
   function makeBoard(cols, rows) {
     const wrap = document.createElement("div");
@@ -195,8 +242,7 @@
     const dotRows = rows + 1;
     const dotLabel = `${dotCols}x${dotRows} dots`;
 
-    const page = document.createElement("section");
-    page.className = "page";
+    const page = createPage();
 
     const header = document.createElement("div");
     header.className = "page-header";
@@ -211,8 +257,10 @@
     `;
 
     page.append(header, board, footer);
-    book.appendChild(page);
   }
+
+  makeTitlePage();
+  makeBlankPage();
 
   groups.forEach(group => {
     for (let i = 0; i < pagesPerGroup; i++) {
